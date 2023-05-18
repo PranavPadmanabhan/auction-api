@@ -39,7 +39,7 @@ app.listen(port, () => {
 
 
 
-console.log(Date.now())
-console.log(Date.now() + 3600)
+// console.log(Date.now())
+// console.log(Date.now() + 3600)
 
 
