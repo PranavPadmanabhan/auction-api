@@ -218,7 +218,12 @@ export const Bid = async(req:Request,res:Response) => {
                 userId:user.userId,
                 name: user.name,
                 userName:user.userName
-            }]
+            }];
+            const nextIndex = room.activeBidderIndex! < room.participants.length - 1?room.activeBidderIndex! + 1 : 0;
+            const nextParticipant = room.participants[nextIndex].userId;
+            room.activeBidderIndex = nextIndex;
+            room.activeBidder = nextParticipant;
+            room.timestamp = Date.now()
            await room.save();
            res.status(200).json(room)
         }
