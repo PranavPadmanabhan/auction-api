@@ -5,7 +5,7 @@ import authRoute from './routes/auth'
 import roomsRoute from './routes/rooms'
 import mongoose from 'mongoose';
 import "dotenv/config"
-import { apiKeyMiddleware } from './utils/helper-functions';
+import { ListenAuctions, apiKeyMiddleware } from './utils/helper-functions';
 
 const app = express();
 
@@ -35,6 +35,7 @@ mongoose.connect(process.env.MONGO_URL!).then(() => console.log(`mongoDB connect
 
 app.listen(port, () => {
     console.log(`app running at http://localhost:${port}`)
+    ListenAuctions()
 })  
 
 

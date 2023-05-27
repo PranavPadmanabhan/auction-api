@@ -161,13 +161,29 @@ export const JoinPublicRoom = async(req:Request,res:Response) => {
     }
 }
 
+export const GetRooms = async(req:Request,res:Response) => {
+       try {
+        const rooms = await Rooms.find({});
+        if(rooms){
+           res.status(200).json(rooms)
+        }
+        else {
+            res.status(200).json({
+                error:true,
+                message:'Room Not Found'
+               })
+        }
+       } catch (error) {
+        
+       }
+}
+
 export const GetRoom = async(req:Request,res:Response) => {
     const roomId = req.params.roomId
     if(roomId){
        try {
         const room = await Rooms.findOne({ roomId });
         if(room){
-           await room.save();
            res.status(200).json(room)
         }
         else {
