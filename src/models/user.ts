@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
             phone:String,
             countryCode:String
         }
+    },
+    cart:{
+        type:Array
     }
 })
 

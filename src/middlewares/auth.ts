@@ -17,7 +17,7 @@ function generateUserName(length: number): string {
 }
 
 export const AddUser = async (req: Request, res: Response) => {
-    const { name, email, image, phone, code } = req.body;
+    const { name, email, image, phone, code,pan,docUrl } = req.body;
     if (name && email) {
         try {
             const user = await Users.findOne({
@@ -28,6 +28,9 @@ export const AddUser = async (req: Request, res: Response) => {
                             phone,
                             countryCode: code
                         }
+                    },
+                    {
+                        PAN:pan
                     }
                 ]
             })
@@ -47,7 +50,10 @@ export const AddUser = async (req: Request, res: Response) => {
                     contactDetails: {
                         phone,
                         countryCode: code
-                    }
+                    },
+                    cart:[],
+                    PAN:pan,
+                    document:docUrl
                 })
                 const userCreated = await newUser.save()
                 res.status(200).json({
