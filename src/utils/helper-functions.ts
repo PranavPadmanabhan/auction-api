@@ -23,7 +23,7 @@ export const ListenAuctions = async () => {
       Rooms.find({}).maxTimeMS(20000).then(async (rooms) => {
         console.log('total rooms : ', rooms.length)
         for (let i = 0; i < rooms.length; i++) {
-          if (rooms[i].startingTime < Date.now() && rooms[i].endingTime > Date.now()) {
+          if (new Date(rooms[i].startingTime).getTime() < Date.now() && new Date(rooms[i].endingTime).getTime() > Date.now()) {
             const isEligible = rooms[i].timestamp! - Date.now() >= 25000 || Date.now() - rooms[i].timestamp! >= 25000;
             console.log('eligibility - ', isEligible);
             if (isEligible) {
@@ -38,7 +38,7 @@ export const ListenAuctions = async () => {
 
           }
           else {
-            if (rooms[i].endingTime < Date.now()) {
+            if (new Date(rooms[i].endingTime).getTime() < Date.now()) {
               if (rooms[i].participants?.length > 0) {
                 const sorted = rooms[i].participants?.sort((a, b) => {
                   if (a.bidAmount < b.bidAmount) {

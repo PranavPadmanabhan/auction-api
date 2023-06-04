@@ -212,7 +212,7 @@ export const Bid = async(req:Request,res:Response) => {
         const user = await Users.findOne({ userId })
         const room = await Rooms.findOne({ roomId });
         if(room && user){
-          if(room.endingTime > Date.now()){
+          if(new Date(room.endingTime).getTime() > Date.now()){
             room.participants = room.participants?.map(item => item.userId === userId?{...item,bidAmount:room.currentBidPrice! + parseInt(increment)}:item)
             const nextIndex = room.activeBidderIndex! < room.participants.length - 1?room.activeBidderIndex! + 1 : 0;
             const nextParticipant = room.participants[nextIndex].userId;
@@ -256,7 +256,7 @@ export const Skip = async(req:Request,res:Response) => {
         const user = await Users.findOne({ userId })
         const room = await Rooms.findOne({ roomId });
         if(room && user){
-          if(room.endingTime > Date.now()){
+          if(new Date(room.endingTime).getTime() > Date.now()){
             const nextIndex = room.activeBidderIndex! < room.participants.length - 1?room.activeBidderIndex! + 1 : 0;
             const nextParticipant = room.participants[nextIndex].userId;
             room.activeBidderIndex = nextIndex;

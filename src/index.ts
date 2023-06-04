@@ -30,12 +30,15 @@ app.post('/', (req, res) => {
     console.log(req.body)
     res.send('Hello World');
 });
-mongoose.connect(process.env.MONGO_URL!).then(() => console.log(`mongoDB connected`)).catch((err) => console.log(err.message))
+mongoose.connect(process.env.MONGO_URL!).then(() => {
+    console.log(`mongoDB connected`)
+    ListenAuctions()
+}).catch((err) => console.log(err.message))
 
 
 app.listen(port, () => {
     console.log(`app running at http://localhost:${port}`)
-    ListenAuctions()
+    
 })  
 
 
