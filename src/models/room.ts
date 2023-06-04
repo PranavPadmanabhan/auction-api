@@ -14,7 +14,6 @@ const room = new Schema({
         required:true
     },
     currentBidPrice:{type:String },
-    biddersList:{ type: Array },
     entryCode:{type:String,unique:true },
     participants:{ type: Array,required:true },
     basePrice:{ type:Number,required:true },

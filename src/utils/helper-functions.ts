@@ -39,8 +39,8 @@ export const ListenAuctions = async () => {
           }
           else {
             if (rooms[i].endingTime < Date.now()) {
-              if (rooms[i].biddersList.length > 0) {
-                const sorted = rooms[i].biddersList.sort((a, b) => {
+              if (rooms[i].participants?.length > 0) {
+                const sorted = rooms[i].participants?.sort((a, b) => {
                   if (a.bidAmount < b.bidAmount) {
                     return 1
                   }
@@ -48,6 +48,7 @@ export const ListenAuctions = async () => {
                     return -1
                   }
                 })
+               if(sorted.length > 0){
                 const user = await Users.findOne({ userId: sorted[0].userId })
                 const owner = await Users.findOne({ userId: rooms[i].admin })
                 if (user && owner) {
@@ -57,7 +58,13 @@ export const ListenAuctions = async () => {
                     owner
                   }]
                   await user.save()
+                  owner.CompletedAuctions = [...owner.CompletedAuctions, {
+                    productDetails:rooms[i].productDetails,
+                    newOwner:user
+                  }]
+                  await owner.save()
                 }
+               }
 
               }
               await Rooms.findByIdAndDelete(rooms[i]._id)

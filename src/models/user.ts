@@ -16,7 +16,8 @@ const userSchema = new mongoose.Schema({
     },
     cart:{
         type:Array
-    }
+    },
+    CompletedAuctions:{ type:Array }
 })
 
 export default mongoose.model('Users',userSchema);

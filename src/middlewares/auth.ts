@@ -53,7 +53,8 @@ export const AddUser = async (req: Request, res: Response) => {
                     },
                     cart:[],
                     PAN:pan,
-                    document:docUrl
+                    document:docUrl,
+                    CompletedAuctions:[]
                 })
                 const userCreated = await newUser.save()
                 res.status(200).json({

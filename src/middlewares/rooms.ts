@@ -58,7 +58,6 @@ export const CreateRoom = async (req: Request, res: Response) => {
                     activeBidderIndex:0,
                     timestamp:Date.now(),
                     maximumParticipants,
-                    biddersList:[],
                     currentBidPrice:basePrice,
                 })
                 const roomCreated = await newRoom.save();
@@ -103,7 +102,7 @@ export const JoinPrivateRoom = async(req:Request,res:Response) => {
         const room = await Rooms.findOne({ entryCode:roomCode });
         const user = await Users.findOne({ userId });
         if(room && user){
-           room.participants = [ ...room.participants,user ]
+           room.participants = [ ...room.participants,{...user,bidAmount:0} ]
            await room.save();
            res.status(200).json({
             error:false,
@@ -136,7 +135,7 @@ export const JoinPublicRoom = async(req:Request,res:Response) => {
         const room = await Rooms.findOne({ entryCode:roomCode });
         const user = await Users.findOne({ userId });
         if(room && user){
-           room.participants = [ ...room.participants,user ]
+           room.participants = [ ...room.participants,{...user,bidAmount:0} ]
            await room.save();
            res.status(200).json({
             error:false,
@@ -208,17 +207,13 @@ export const GetRoom = async(req:Request,res:Response) => {
 export const Bid = async(req:Request,res:Response) => {
     const roomId = req.params.roomId
     const { increment,userId } = req.body
-    if(roomId&& increment){
+    if(roomId&& increment && userId){
        try {
         const user = await Users.findOne({ userId })
         const room = await Rooms.findOne({ roomId });
         if(room && user){
-            room.biddersList = [...room.biddersList,{
-                bidAmount: room.currentBidPrice! + parseInt(increment),
-                userId:user.userId,
-                name: user.name,
-                userName:user.userName
-            }];
+          if(room.endingTime > Date.now()){
+            room.participants = room.participants?.map(item => item.userId === userId?{...item,bidAmount:room.currentBidPrice! + parseInt(increment)}:item)
             const nextIndex = room.activeBidderIndex! < room.participants.length - 1?room.activeBidderIndex! + 1 : 0;
             const nextParticipant = room.participants[nextIndex].userId;
             room.activeBidderIndex = nextIndex;
@@ -226,6 +221,13 @@ export const Bid = async(req:Request,res:Response) => {
             room.timestamp = Date.now()
            await room.save();
            res.status(200).json(room)
+          }
+          else {
+            res.status(200).json({
+                error:true,
+                message:'auction has ended'
+               })
+          }
         }
         else {
             res.status(200).json({
@@ -244,6 +246,50 @@ export const Bid = async(req:Request,res:Response) => {
            })
     }
 }
+
+
+export const Skip = async(req:Request,res:Response) => {
+    const roomId = req.params.roomId
+    const { userId } = req.body
+    if(roomId&& userId){
+       try {
+        const user = await Users.findOne({ userId })
+        const room = await Rooms.findOne({ roomId });
+        if(room && user){
+          if(room.endingTime > Date.now()){
+            const nextIndex = room.activeBidderIndex! < room.participants.length - 1?room.activeBidderIndex! + 1 : 0;
+            const nextParticipant = room.participants[nextIndex].userId;
+            room.activeBidderIndex = nextIndex;
+            room.activeBidder = nextParticipant;
+            room.timestamp = Date.now()
+           await room.save();
+           res.status(200).json(room)
+          }
+          else {
+            res.status(200).json({
+                error:true,
+                message:'auction has ended'
+               })
+          }
+        }
+        else {
+            res.status(200).json({
+                error:true,
+                message:'Room Not Found'
+               })
+        }
+       } catch (error) {
+        
+       }
+    }
+    else {
+        res.status(200).json({
+            error:true,
+            message:'fields are missing'
+           })
+    }
+}
+
 
 
 export const GetActiveBidder = async(req:Request,res:Response) => {
